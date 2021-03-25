@@ -9,7 +9,10 @@ import com.black.fixedlength.FLTConfig;
 import com.black.fixedlength.annotation.Column;
 import com.black.fixedlength.annotation.Record;
 
-
+/**
+ * アノテーションを操作する処理をまとめたクラス
+ *
+ */
 public class FLTAnnotationManager {
 
 	/**
@@ -19,7 +22,7 @@ public class FLTAnnotationManager {
 	 * @param clazz @インターフェースが実装されいるクラス
 	 * @return 固定長幅
 	 */
-	protected static <T> int getRecodeSize(Class<T> clazz) {
+	protected static <T> int getRecordSize(Class<T> clazz) {
 		Field[] fields = clazz.getDeclaredFields();
 
 		int length = 0;
@@ -65,7 +68,7 @@ public class FLTAnnotationManager {
 	 * @throws IllegalAccessException {@code clazz}が対応していない場合
 	 * @throws UnsupportedEncodingException 指定された文字セットがサポートされていない場合
 	 * @throws IndexOutOfBoundsException 指定されたclazzまたは、指定されたstrのフォーマットが一致していない場合
-	 * @throws ParseException
+	 * @throws ParseException 値の型変換に失敗した場合
 	 */
 	protected <T> T convertToEntity(FLTConfig conf, Class<T> clazz, String str) throws InstantiationException, IllegalAccessException, IndexOutOfBoundsException, UnsupportedEncodingException, ParseException {
 		@SuppressWarnings("unchecked")
@@ -134,7 +137,7 @@ public class FLTAnnotationManager {
 	 * @param str 変換する文字列
 	 * @param type 変換する型
 	 * @return 変換されたオブジェクト
-	 * @throws ParseException
+	 * @throws ParseException 値の型変換に失敗した場合
 	 * @throws IllegalArgumentException 変換に失敗した場合
 	 */
 	public Object convert(String str, Class<?> type, FLTConfig conf) throws ParseException {

@@ -1,5 +1,8 @@
 package com.black.fixedlength.format;
-
+/**
+ * 読み込み時のデフォルトで指定されるトリミングフォーマット
+ *
+ */
 public class DefaultTrimmingFormatter implements TrimmingFormat {
 
 	@Override

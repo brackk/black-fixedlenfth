@@ -10,6 +10,12 @@ import com.black.fixedlength.FLTConfig;
 
 
 
+/**
+ *
+ * 固定長ファイル⇒POJOへの変換を提供します。
+ *
+ * @param <T>
+ */
 public class FLTEntityReader<T> implements AutoCloseable {
 
 	private Class<T> clazz;
@@ -33,17 +39,16 @@ public class FLTEntityReader<T> implements AutoCloseable {
 	 * @return 指定された{@code clazz}のインスタンス
 	 * @throws FileNotFoundException ファイルが存在しないか、通常ファイルではなくディレクトリであるか、またはなんらかの理由で開くことができない場合。
 	 * @throws UnsupportedEncodingException 指定された文字セットがサポートされていない場合
-	 * @throws IllegalArgumentException パラメータが不正な場合
 	 */
 	public FLTEntityReader(FLTConfig conf, Path inputPath, Class<T> clazz)
-			throws FileNotFoundException, UnsupportedEncodingException, IllegalArgumentException {
+			throws FileNotFoundException, UnsupportedEncodingException {
 
 		this.conf = conf;
 		this.clazz = clazz;
 		annotationManager = new FLTAnnotationManager();
 
 		// 指定された固定長形式情報を使用して、インスタンスを構築します。
-		reader = new FLTReader(conf, inputPath, FLTAnnotationManager.getRecodeSize(clazz));
+		reader = new FLTReader(conf, inputPath, FLTAnnotationManager.getRecordSize(clazz));
 	}
 
 	/**
@@ -52,12 +57,10 @@ public class FLTEntityReader<T> implements AutoCloseable {
 	 * 指定されているrecodeSizeより数値が小さい場合はIOExceptionをスローします。
 	 *
 	 * @return 指定されたclazzのインスタンス
-	 * @throws IllegalStateException 実行できる状態でない場合
-	 * @throws IllegalArgumentException 指定されている設定情報が不正の場合
 	 * @throws IOException 入出力でエラーが発生した場合
 	 * @throws IllegalAccessException {@code clazz}が対応していない場合
 	 * @throws InstantiationException 指定されたclazzが抽象クラス、インタフェース、配列クラス、プリミティブ型、またはvoidを表す場合、クラスが引数なしのコンストラクタを保持しない場合、あるいはインスタンスの生成がほかの理由で失敗した場合
-	 * @throws ParseException
+	 * @throws ParseException 値の型変換に失敗した場合
 	 */
 	public T read() throws IllegalStateException, IOException, InstantiationException, IllegalAccessException, ParseException {
 		String str = reader.read();
@@ -99,14 +102,13 @@ public class FLTEntityReader<T> implements AutoCloseable {
 	 *
 	 * @param clazz ヘッダレコード格納先クラス
 	 * @return 指定されたclazzのインスタンス
-	 * @throws IllegalStateException 実行できる状態でない場合
-	 * @throws IllegalArgumentException 指定されている設定情報が不正の場合
 	 * @throws IOException 入出力でエラーが発生した場合
 	 * @throws IllegalAccessException {@code clazz}が対応していない場合
 	 * @throws InstantiationException 指定されたclazzが抽象クラス、インタフェース、配列クラス、プリミティブ型、またはvoidを表す場合、クラスが引数なしのコンストラクタを保持しない場合、あるいはインスタンスの生成がほかの理由で失敗した場合
-	 * @throws ParseException
+	 * @throws ParseException 値の型変換に失敗した場合
 	 */
-	public <T> T getHeader(Class<T> clazz) throws InstantiationException, IllegalAccessException, IndexOutOfBoundsException, IllegalStateException, IOException, ParseException {
+	@SuppressWarnings("hiding")
+	public <T> T getHeader(Class<T> clazz) throws InstantiationException, IllegalAccessException, IndexOutOfBoundsException, IOException, ParseException {
 		if ((readCount > 0 && headerRecord == null)) {
 			return null;
 		} else if(headerRecord == null) {
@@ -132,13 +134,12 @@ public class FLTEntityReader<T> implements AutoCloseable {
 	 *
 	 * @param clazz トレーラレコード格納先クラス
 	 * @return 指定されたclazzのインスタンス
-	 * @throws IllegalStateException 実行できる状態でない場合
-	 * @throws IllegalArgumentException 指定されている設定情報が不正の場合
 	 * @throws IOException 入出力でエラーが発生した場合
 	 * @throws IllegalAccessException {@code clazz}が対応していない場合
 	 * @throws InstantiationException 指定されたclazzが抽象クラス、インタフェース、配列クラス、プリミティブ型、またはvoidを表す場合、クラスが引数なしのコンストラクタを保持しない場合、あるいはインスタンスの生成がほかの理由で失敗した場合
-	 * @throws ParseException
+	 * @throws ParseException 値の型変換に失敗した場合
 	 */
+	@SuppressWarnings("hiding")
 	public <T> T getTrailer(Class<T> clazz) throws InstantiationException, IllegalAccessException, IndexOutOfBoundsException, UnsupportedEncodingException, ParseException {
 		if (!endOfFile) {
 			throw new IllegalStateException("file not complete read.");
