@@ -17,7 +17,7 @@ import com.black.fixedlength.exception.FixedLengthFormatException;
  */
 public class FLTReader implements AutoCloseable {
 	private FLTConfig conf;
-	private int recodeSize;
+	private int recordSize;
 
 	private BufferedReader reader;
 
@@ -26,16 +26,17 @@ public class FLTReader implements AutoCloseable {
 	 *
 	 * @param conf 固定長形式情報
 	 * @param inputPath 読み込み先ファイルパス
-	 * @param recodeSize レコードサイズ
+	 * @param recordSize レコードサイズ
 	 * @throws FileNotFoundException  ファイルが存在しないか、通常ファイルではなくディレクトリであるか、またはなんらかの理由で開くことができない場合。
 	 * @throws UnsupportedEncodingException 指定された文字セットがサポートされていない場合
 	 */
-	public FLTReader(FLTConfig conf, Path inputPath, int recodeSize) throws FileNotFoundException, UnsupportedEncodingException, IllegalArgumentException {
-		if (conf == null || inputPath == null || recodeSize == 0) {
+	public FLTReader(FLTConfig conf, Path inputPath, int recordSize) throws FileNotFoundException, UnsupportedEncodingException, IllegalArgumentException {
+		if (conf == null || inputPath == null || recordSize == 0) {
 			throw new IllegalArgumentException("Invalid argument specified.");
 		}
 
 		this.conf = conf;
+		this.recordSize = recordSize;
 
 		FileInputStream input = new FileInputStream(inputPath.toFile());
 		InputStreamReader stream = new InputStreamReader(input,conf.getCharCode());
@@ -50,13 +51,14 @@ public class FLTReader implements AutoCloseable {
 	 * @throws FileNotFoundException  ファイルが存在しないか、通常ファイルではなくディレクトリであるか、またはなんらかの理由で開くことができない場合。
 	 * @throws UnsupportedEncodingException 指定された文字セットがサポートされていない場合
 	 */
-	public FLTReader(BufferedReader reader, FLTConfig conf, Path inputPath, int recodeSize) throws FileNotFoundException, UnsupportedEncodingException, IllegalArgumentException {
-		if (conf == null || inputPath == null || recodeSize == 0) {
+	public FLTReader(BufferedReader reader, FLTConfig conf, Path inputPath, int recordSize) throws FileNotFoundException, UnsupportedEncodingException, IllegalArgumentException {
+		if (conf == null || inputPath == null || recordSize == 0) {
 			throw new IllegalArgumentException("Invalid argument specified.");
 		}
 
 		this.conf = conf;
 		this.reader = reader;
+		this.recordSize = recordSize;
 	}
 
 
@@ -98,18 +100,18 @@ public class FLTReader implements AutoCloseable {
 		case BYTE :
 			byte[] byt = str.getBytes(conf.getCharCode());
 
-			if (byt.length < recodeSize) {
+			if (byt.length < recordSize) {
 				throw new FixedLengthFormatException("The number of bytes in the record is not met.");
 			}
-			ret = new String(str.getBytes(conf.getCharCode()), 0, recodeSize, conf.getCharCode());
+			ret = new String(str.getBytes(conf.getCharCode()), 0, recordSize, conf.getCharCode());
 			break;
 
 		case STRING :
 		default:
-			if (str.length() < recodeSize) {
+			if (str.length() < recordSize) {
 				throw new FixedLengthFormatException("The number of characters in the record is not satisfied.");
 			}
-			ret = str.substring(0, recodeSize);
+			ret = str.substring(0, recordSize);
 			break;
 		}
 

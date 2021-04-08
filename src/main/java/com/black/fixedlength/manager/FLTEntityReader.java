@@ -53,8 +53,8 @@ public class FLTEntityReader<T> implements AutoCloseable {
 
 	/**
 	 * 1行を読み込みクラスに格納し返却します。
-	 * 指定されているrecodeSizeより数値が大きい場合は範囲のデータのみ取得します。
-	 * 指定されているrecodeSizeより数値が小さい場合はIOExceptionをスローします。
+	 * 指定されているrecordSizeより数値が大きい場合は範囲のデータのみ取得します。
+	 * 指定されているrecordSizeより数値が小さい場合はIOExceptionをスローします。
 	 *
 	 * @return 指定されたclazzのインスタンス
 	 * @throws IOException 入出力でエラーが発生した場合

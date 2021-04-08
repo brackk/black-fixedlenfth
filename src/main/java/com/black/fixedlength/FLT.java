@@ -14,6 +14,9 @@ import com.black.fixedlength.manager.FLTEntityReader;
  */
 public class FLT {
 
+	private Object header;
+	private Object trailer;
+
 	/**
 	 * 固定長ファイルを出力します。
 	 *
@@ -43,7 +46,33 @@ public class FLT {
 		try (FLTEntityReader<T> entityReader = new FLTEntityReader<>(conf, inputPath, clazz);) {
 			T line = null;
 			while ((line = entityReader.read()) != null) {
+				ret.add(line);
+			}
+		}
 
+		return ret;
+	}
+
+	/**
+	 * 固定長ファイルを読み込みます。
+	 * @param <N>
+	 * @param <V>
+	 *
+	 * @param conf 固定長形式情報
+	 * @param clazz 格納先クラス
+	 * @return 指定された{@code clazz}のインスタンスのList
+	 * @throws IllegalAccessException 指定されたclazzが対応していない場合
+	 * @throws InstantiationException 指定されたclazzが抽象クラス、インタフェース、配列クラス、プリミティブ型、またはvoidを表す場合、クラスが引数なしのコンストラクタを保持しない場合、あるいはインスタンスの生成がほかの理由で失敗した場合
+	 * @throws IOException 入出力でエラーが発生した場合
+	 * @throws ParseException 値の型変換に失敗した場合
+	 */
+	public static <T, N, V> List<T> load(FLTConfig conf,Path inputPath, Class<T> clazz, Class<V> headerClazz, Class<N> trailerClazz)
+			throws InstantiationException, IllegalAccessException, IOException, ParseException {
+		List<T> ret = new ArrayList<T>();
+
+		try (FLTEntityReader<T> entityReader = new FLTEntityReader<>(conf, inputPath, clazz);) {
+			T line = null;
+			while ((line = entityReader.read()) != null) {
 				ret.add(line);
 			}
 		}

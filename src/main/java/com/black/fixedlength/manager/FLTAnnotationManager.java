@@ -93,6 +93,51 @@ public class FLTAnnotationManager {
 		return ret;
 	}
 
+	/**
+	 * 指定されたエンティティを固定長文字列に変換し、返却します。
+	 *
+	 * @param conf 固定長形式情報
+	 * @param entity 変換元エンティティ
+	 * @return 固定長文字列
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 * @throws UnsupportedEncodingException
+	 */
+	protected <T> String convertToFixedlength(FLTConfig conf, T entity) throws IllegalArgumentException, IllegalAccessException, UnsupportedEncodingException {
+
+		String ret = null;
+		Field[] fields = entity.getClass().getDeclaredFields();
+
+		for (Field field : fields) {
+			Column column = field.getAnnotation(Column.class);
+
+			if (column != null) {
+				String value = convert(field.get(entity), conf);
+
+				int length = 0;
+				switch (conf.getFltType()) {
+				case BYTE :
+					length = column.length() - value.getBytes(conf.getCharCode()).length;
+					break;
+
+				case STRING :
+					length = column.length() - value.length();
+					break;
+				default:
+					throw new IllegalArgumentException(String.format("Unknown enum tyoe %s", conf.getFltType()));
+				}
+
+				value = conf.getPaddingFormat(entity.getClass()).padding(value, length);
+				if (value == null) {
+					throw new IllegalArgumentException(String.format("Not setting PaddingFormat %s", entity.getClass()));
+				}
+				ret += value;
+			}
+		}
+
+		return ret;
+	}
+
 
 	/**
 	 * 指定された文字列から固定長の文字列を抜き出します。
@@ -140,7 +185,7 @@ public class FLTAnnotationManager {
 	 * @throws ParseException 値の型変換に失敗した場合
 	 * @throws IllegalArgumentException 変換に失敗した場合
 	 */
-	public Object convert(String str, Class<?> type, FLTConfig conf) throws ParseException {
+	protected Object convert(String str, Class<?> type, FLTConfig conf) throws ParseException {
 
 		if (type == null) {
 			return null;
@@ -158,13 +203,9 @@ public class FLTAnnotationManager {
 			return Float.valueOf(str);
 		} else if (type == byte.class || type == Byte.class) {
 			return Byte.valueOf(str);
-		} else if (type == char.class) {
+		} else if (type == char.class || type == Character.class) {
 			char[] chars = str.toCharArray();
-			if (chars.length == 1) {
-				return chars[0];
-			} else {
-				return null;
-			}
+			return Character.valueOf(chars.length == 0 ? null : chars[0] );
 		} else if (type == short.class || type == Short.class) {
 			return Short.valueOf(str);
 		} else if (type == java.util.Date.class || type == java.sql.Date.class || type == Calendar.class || type == java.sql.Timestamp.class) {
@@ -185,5 +226,52 @@ public class FLTAnnotationManager {
 		}
 
 		return null;
+	}
+
+	/**
+	 * 指定されたobject型からString型へ変換し返却します。
+	 *
+	 * @param obj 変換を行うオブジェクト
+	 * @param conf 固定長形式情報
+	 * @return 文字列
+	 */
+	protected String convert(Object obj, FLTConfig conf) {
+		Class<?> type = obj.getClass();
+
+		if (type == String.class) {
+			return obj.toString();
+		} else if (type == int.class ||  type == Integer.class) {
+			return obj.toString();
+		} else if (type == double.class|| type == Double.class ) {
+			return obj.toString();
+		} else if (type == long.class || type == Long.class) {
+			return obj.toString();
+		} else if (type == float.class || type == Float.class) {
+			return obj.toString();
+		} else if (type == byte.class || type == Byte.class) {
+			return obj.toString();
+		} else if (type == char.class || type == Character.class) {
+			return obj.toString();
+		} else if (type == short.class || type == Short.class) {
+			return obj.toString();
+		} else if (type == java.util.Date.class || type == java.sql.Date.class || type == Calendar.class || type == java.sql.Timestamp.class) {
+			if (conf.getDateFormat() == null) {
+				throw new IllegalArgumentException("The conversion date format is not set.");
+			}
+			if (type == java.util.Date.class) {
+				return conf.getDateFormat().format(obj);
+			} else if (type == java.sql.Date.class) {
+				java.util.Date date = new java.util.Date(((java.sql.Date)obj).getTime());
+				return conf.getDateFormat().format(date);
+			} else if (type == Calendar.class) {
+				java.util.Date date = ((Calendar)obj).getTime();
+				return conf.getDateFormat().format(date);
+			} else if (type == java.sql.Timestamp.class) {
+				java.util.Date date = new java.util.Date(((java.sql.Timestamp)obj).getTime());
+				return conf.getDateFormat().format(date);
+			}
+		}
+
+		throw new IllegalArgumentException(String.format("Unknown convert type %s", type));
 	}
 }
