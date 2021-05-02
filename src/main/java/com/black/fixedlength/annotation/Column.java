@@ -25,6 +25,6 @@ public @interface Column {
 	 * 名称(この値は、動作に影響を与えるものではありません。)
 	 * @return
 	 */
-	String name();
+	String name() default "";
 
 }

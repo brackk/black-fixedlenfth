@@ -71,13 +71,13 @@ public class FLTAnnotationManager {
 	 * @throws ParseException 値の型変換に失敗した場合
 	 */
 	protected <T> T convertToEntity(FLTConfig conf, Class<T> clazz, String str) throws InstantiationException, IllegalAccessException, IndexOutOfBoundsException, UnsupportedEncodingException, ParseException {
-		@SuppressWarnings("unchecked")
-		T ret = (T) clazz.getSuperclass().newInstance();
+		T ret = (T) clazz.newInstance();
 
 		Field[] fields = clazz.getDeclaredFields();
 
 		int beginIndex = 0;
 		for (Field field : fields) {
+			field.setAccessible(true);
 			Column column = field.getAnnotation(Column.class);
 
 			if (column != null) {
@@ -192,7 +192,7 @@ public class FLTAnnotationManager {
 		}
 
 		if (type == String.class) {
-			return str;
+			return str.toString();
 		} else if (type == int.class ||  type == Integer.class) {
 			return Integer.valueOf(str);
 		} else if (type == double.class|| type == Double.class ) {

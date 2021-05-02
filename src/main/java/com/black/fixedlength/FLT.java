@@ -13,10 +13,6 @@ import com.black.fixedlength.manager.FLTEntityReader;
  *
  */
 public class FLT {
-
-	private Object header;
-	private Object trailer;
-
 	/**
 	 * 固定長ファイルを出力します。
 	 *
@@ -55,8 +51,6 @@ public class FLT {
 
 	/**
 	 * 固定長ファイルを読み込みます。
-	 * @param <N>
-	 * @param <V>
 	 *
 	 * @param conf 固定長形式情報
 	 * @param clazz 格納先クラス
@@ -66,14 +60,31 @@ public class FLT {
 	 * @throws IOException 入出力でエラーが発生した場合
 	 * @throws ParseException 値の型変換に失敗した場合
 	 */
-	public static <T, N, V> List<T> load(FLTConfig conf,Path inputPath, Class<T> clazz, Class<V> headerClazz, Class<N> trailerClazz)
+	public static <T> List<Object> load(FLTConfig conf,Path inputPath, Class<T> clazz, Class<?> headerClazz, Class<?> trailerClazz)
 			throws InstantiationException, IllegalAccessException, IOException, ParseException {
-		List<T> ret = new ArrayList<T>();
+		List<Object> ret = new ArrayList<Object>();
 
 		try (FLTEntityReader<T> entityReader = new FLTEntityReader<>(conf, inputPath, clazz);) {
 			T line = null;
+
+			if (headerClazz != null) {
+				Object obj = entityReader.getHeader(headerClazz);
+				if (obj == null) {
+					throw new IllegalArgumentException("Header does not exist.");
+				}
+				ret.add(obj);
+			}
+
 			while ((line = entityReader.read()) != null) {
 				ret.add(line);
+			}
+
+			if (trailerClazz != null) {
+				Object obj = entityReader.getTrailer(trailerClazz);
+				if (obj == null) {
+					throw new IllegalArgumentException("Trailer does not exist.");
+				}
+				ret.add(obj);
 			}
 		}
 

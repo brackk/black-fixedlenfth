@@ -21,5 +21,5 @@ public @interface Record {
 	 * 指定されていない場合、判定を行いません。
 	 * @return
 	 */
-	String recordCodeNum();
+	String recordCodeNum() default "";
 }
