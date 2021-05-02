@@ -109,6 +109,7 @@ public class FLTAnnotationManager {
 		Field[] fields = entity.getClass().getDeclaredFields();
 
 		for (Field field : fields) {
+			field.setAccessible(true);
 			Column column = field.getAnnotation(Column.class);
 
 			if (column != null) {
