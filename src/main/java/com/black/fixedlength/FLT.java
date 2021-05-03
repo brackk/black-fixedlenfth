@@ -1,12 +1,15 @@
 package com.black.fixedlength;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.black.fixedlength.manager.FLTEntityReader;
+import com.black.fixedlength.manager.FLTEntityWriter;
 
 /**
  * 固定長ファイルの読み込み/書き込みを提供します。
@@ -15,12 +18,22 @@ import com.black.fixedlength.manager.FLTEntityReader;
 public class FLT {
 	/**
 	 * 固定長ファイルを出力します。
+	 * @param <T>
 	 *
 	 * @param conf 固定長形式情報
 	 * @param outputPath 出力先ファイルパス
+	 * @throws IOException
+	 * @throws UnsupportedEncodingException
+	 * @throws FileNotFoundException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
 	 */
-	public static void save(FLTConfig conf, Path outputPath) {
-
+	public static <T> void save(FLTConfig conf, Path outputPath, List<T> obj) throws FileNotFoundException, UnsupportedEncodingException, IOException, IllegalArgumentException, IllegalAccessException {
+		try (FLTEntityWriter entityWriter = new FLTEntityWriter(conf, outputPath)) {
+			for (T entity : obj) {
+				entityWriter.write(entity);
+			}
+		}
 	}
 
 

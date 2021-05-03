@@ -4,7 +4,7 @@ public class DefaultBlankPaddingFormatter implements PaddingFormat {
 
 	@Override
 	public String padding(String param, int length) {
-		return String.format("%-" + length + "s", param);
+		return length == 0 ? param : String.format("%-" + length + "s", param);
 	}
 
 }

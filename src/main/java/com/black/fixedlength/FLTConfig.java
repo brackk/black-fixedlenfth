@@ -75,6 +75,7 @@ public class FLTConfig {
 		paddingMap.put(float.class, new DefaultZeroPaddingFormatter());
 		paddingMap.put(Float.class, new DefaultZeroPaddingFormatter());
 
+		paddingMap.put(String.class, new DefaultBlankPaddingFormatter());
 		paddingMap.put(byte.class, new DefaultBlankPaddingFormatter());
 		paddingMap.put(Byte.class, new DefaultBlankPaddingFormatter());
 		paddingMap.put(char.class, new DefaultBlankPaddingFormatter());

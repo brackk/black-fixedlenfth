@@ -41,7 +41,7 @@ public class FLTEntityWriter implements AutoCloseable {
 	 * @throws IllegalArgumentException
 	 * @throws IOException
 	 */
-	public <T> void write(T entity) throws IllegalArgumentException, IllegalAccessException, IOException {
+	public <T> void write(T entity) throws IOException, IllegalArgumentException, IllegalAccessException {
 		if (entity == null) {
 			throw new IllegalArgumentException("Invalid argument specified.");
 		}

@@ -105,7 +105,7 @@ public class FLTAnnotationManager {
 	 */
 	protected <T> String convertToFixedlength(FLTConfig conf, T entity) throws IllegalArgumentException, IllegalAccessException, UnsupportedEncodingException {
 
-		String ret = null;
+		String ret = "";
 		Field[] fields = entity.getClass().getDeclaredFields();
 
 		for (Field field : fields) {
@@ -118,17 +118,17 @@ public class FLTAnnotationManager {
 				int length = 0;
 				switch (conf.getFltType()) {
 				case BYTE :
-					length = column.length() - value.getBytes(conf.getCharCode()).length;
+					length = column.length() - value.getBytes(conf.getCharCode()).length + value.length();
 					break;
 
 				case STRING :
-					length = column.length() - value.length();
+					length = column.length();
 					break;
 				default:
 					throw new IllegalArgumentException(String.format("Unknown enum tyoe %s", conf.getFltType()));
 				}
 
-				value = conf.getPaddingFormat(entity.getClass()).padding(value, length);
+				value = conf.getPaddingFormat(field.getType()).padding(value, length);
 				if (value == null) {
 					throw new IllegalArgumentException(String.format("Not setting PaddingFormat %s", entity.getClass()));
 				}
